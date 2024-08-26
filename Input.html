@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Paycheck Input</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Navigation Bar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="input.html">Input</a>
+    </div>
+
+    <div class="container">
+        <h1>Enter Weekly Net Paycheck</h1>
+        <form id="paycheckForm">
+            <label for="amount">Weekly Net Paycheck Amount:</label>
+            <input type="number" id="amount" name="amount" required>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        // Script to handle form submission
+        document.getElementById('paycheckForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const amount = document.getElementById('amount').value;
+
+            // Determine all Fridays in August 2024
+            const year = 2024;
+            const month = 7; // August is 7 (0-indexed)
+
+            // Clear the existing budget data for August
+            let budgetData = [];
+
+            for (let day = 1; day <= 31; day++) {
+                const date = new Date(year, month, day);
+                if (date.getDay() === 5) { // 5 = Friday
+                    budgetData.push({
+                        description: 'Weekly Paycheck',
+                        amount: amount,
+                        date: date.toISOString().split('T')[0] // Format date as YYYY-MM-DD
+                    });
+                }
+            }
+
+            // Store the updated paycheck data in localStorage
+            localStorage.setItem('budgetData', JSON.stringify(budgetData));
+
+            // Redirect to calendar page (index.html)
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
