@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-Month Calendar</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Navigation Bar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+
+        /* Highlighted Date and Out-of-Month Styles */
+        .highlight {
+            background-color: #ffeb3b; /* Yellow highlight */
+            border: 2px solid #fbc02d; /* Darker yellow border */
+        }
+
+        .out-of-month {
+            background-color: #e0e0e0; /* Light gray background */
+            color: #9e9e9e; /* Gray text */
+        }
+
+        /* Paycheck Info Styles */
+        .paycheck-info {
+            background-color: #76c7c0; /* Light teal background */
+            color: white; /* White text color */
+            font-size: 12px; /* Smaller font size */
+            padding: 2px;
+            margin-top: 15px; /* Space between the date and paycheck info */
+            border-radius: 5px; /* Rounded corners */
+            text-align: center;
+            display: block; /* Ensures it appears on a new line */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="index.html">Home</a>
+        <a href="input.html">Input</a>
+    </div>
+
+    <div class="calendar">
+        <div class="calendar-header">August 2024</div>
+        <div class="days-of-week">
+            <div class="day">Sun</div>
+            <div class="day">Mon</div>
+            <div class="day">Tue</div>
+            <div class="day">Wed</div>
+            <div class="day">Thu</div>
+            <div class="day">Fri</div>
+            <div class="day">Sat</div>
+        </div>
+        <div class="dates" id="calendarDates">
+            <!-- Dates will be dynamically generated here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const budgetData = JSON.parse(localStorage.getItem('budgetData')) || [];
+            console.log("Loaded budget data:", budgetData);
+
+            const today = new Date();
+
+            // Function to generate calendar
+            function generateCalendar() {
+                const calendarDates = document.getElementById('calendarDates');
+                if (!calendarDates) {
+                    console.error("Element with ID 'calendarDates' not found.");
+                    return;
+                }
+                const daysInMonth = 31; // For August 2024
+                const firstDayOfMonth = new Date('2024-08-01').getDay(); // 0 = Sunday, 1 = Monday, etc.
+                const prevMonthLastDay = new Date('2024-07-31').getDate(); // Last day of the previous month
+
+                // Add cells for days of previous month
+                for (let i = 0; i < firstDayOfMonth; i++) {
+                    const prevDate = prevMonthLastDay - firstDayOfMonth + i + 1;
+                    const emptyCell = document.createElement('div');
+                    emptyCell.classList.add('date', 'out-of-month');
+                    emptyCell.textContent = prevDate;
+                    calendarDates.appendChild(emptyCell);
+                }
+
+                // Add cells for each day of the current month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateCell = document.createElement('div');
+                    dateCell.classList.add('date');
+                    dateCell.textContent = day;
+
+                    // Highlight today's date
+                    if (today.getDate() === day && today.getMonth() === 7 && today.getFullYear() === 2024) {
+                        dateCell.classList.add('highlight');
+                    }
+
+                    // Add paycheck info
+                    budgetData.forEach(item => {
+                        const itemDate = new Date(item.date);
+                        if (itemDate.getDate() === day && itemDate.getMonth() === 7) {
+                            console.log(`Adding paycheck info for day ${day}:`, item);
+                            const budgetInfo = document.createElement('div');
+                            budgetInfo.classList.add('paycheck-info');
+                            budgetInfo.textContent = `${item.description}: $${item.amount}`;
+                            dateCell.appendChild(budgetInfo);
+                        }
+                    });
+
+                    calendarDates.appendChild(dateCell);
+                }
+
+                // Calculate remaining empty cells at the end of the month
+                const totalCells = firstDayOfMonth + daysInMonth;
+                const emptyCells = (7 - (totalCells % 7)) % 7; // Modulus ensures no extra row if the month ends on Saturday
+
+                // Add cells for days of next month
+                for (let i = 1; i <= emptyCells; i++) {
+                    const nextDate = i;
+                    const emptyCell = document.createElement('div');
+                    emptyCell.classList.add('date', 'out-of-month');
+                    emptyCell.textContent = nextDate;
+                    calendarDates.appendChild(emptyCell);
+                }
+            }
+
+            // Call the function to generate the calendar on page load
+            generateCalendar();
+        });
+    </script>
+</body>
+</html>
